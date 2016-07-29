@@ -5,17 +5,17 @@ module load gi/bwa/0.7.12
 #number of cores
 numcores=2
 
-#genome directories
-genomeName="hg38_ercc"
+# chromosome directory:
+projectname="benchmark"
+chromosome="chr21"
 
 homeDir="/home/jamtor"
-genomeDir="$homeDir/genomes/$genomeName"
-genomeFile="$genomeDir/$genomeName.fa"
-outDir="$genomeDir/bwa.index"
+projectDir="$homeDir/projects/$projectname"
+resultsDir="$projectDir/results"
+chrDir="$resultsDir/$chromosome/original"
+chrFile="$chrDir/$chromosome.fa"
 
-mkdir -p $outDir
-
-#log directory
+# log directory
 projectname="benchmark"
 
 projectDir="$homeDir/projects/$projectname"
@@ -24,18 +24,15 @@ logDir="$scriptsPath/logs"
 
 mkdir -p $logDir
 
-echo This is the genomeDir:
-echo $genomeDir
+echo This is the chrDir:
+echo $chrDir
 echo -e
-echo This is the genomeFile:
-echo $genomeFile
-echo -e
-echo This is the outDir
-echo $outDir
+echo This is the chrFile:
+echo $chrFile
 echo -e
 
 #generate the star reference files:
-bwa_index_line="bwa index $genomeFile"
+bwa_index_line="bwa index $chrFile"
 
 echo This is the bwa_index_line:
 echo $bwa_index_line

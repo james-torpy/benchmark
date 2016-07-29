@@ -4,25 +4,25 @@ module load gi/bwa/0.7.12
 
 numcores=6
 
+# specify the number of lines chromosome had been split into to generate the reads:
+split_no="16390_lines"
+
 #make directory hierachy
 projectname="benchmark"
+chromosome="chr21"
 
 homeDir="/home/jamtor"
 projectDir="$homeDir/projects/$projectname"
 resultsDir="$projectDir/results"
-
-#genome directory
-genome="hg38_ercc"
-
-genomeDir="$homeDir/genomes/$genome"
-genomeFile="$genomeDir/$genome.fa"
+chrDir="$resultsDir/$chromosome/original"
+chrFile="$chrDir/$chromosome.fa"
 
 #input/output types
-samplenames=( "artfastqgen.reads" )
+samplenames=( "long.artfastqgen.reads" )
 outType="bwa"
 
 #extension of files to be used:
-inExt=".fastq"
+inExt=".combined.fastq"
 
 #scripts/logs directory
 scriptsPath="$projectDir/scripts/lr_QC_map_count"
@@ -31,18 +31,18 @@ logDir="$scriptsPath/logs"
 mkdir -p $logDir
 
 echo -e
-echo This is the genomeFile:
-echo $genomeFile
+echo "This is the chrFile:"
+echo $chrFile
 echo -e
-echo "The logDir is:"
+echo "This is the logDir:"
 echo $logDir
 
 #get in/outPaths for all samples:
 for samplename in ${samplenames[@]}; do
 
 	#input/output:
-	inPath="$resultsDir/$samplename"
-	outPath="$resultsDir/$outType.$samplename"
+	inPath="$resultsDir/$samplename/from_$split_no"_chunks
+	outPath="$resultsDir/$outType.$samplename/from_$split_no"_chunks
 	
 	echo -e
 	echo This is the inPath:
@@ -50,7 +50,7 @@ for samplename in ${samplenames[@]}; do
 
 #fetch file names of all projects and put into an array:
 	i=0
-	files=( $(ls $inPath/2000bp30x$inExt) )
+	files=( $(ls $inPath/**/combined/*$inExt) )
 	for file in ${files[@]}; do
 		echo -e
 		echo The file used is: $file
@@ -63,9 +63,10 @@ for samplename in ${samplenames[@]}; do
 	echo -e
 	echo Total files = ${#filesTotal[@]}
 	while [ $j -lt ${#filesTotal[@]} ]; do
-		inFile=${filesTotal[$j]}
-		uniqueID=`basename $inFile | sed s/$inExt//`
-		outDir=$outPath/$uniqueID
+		inFile1=${filesTotal[$j]}
+		inFile2=${filesTotal[$j+1]}
+		uniqueID=`basename $inFile1 | sed s/.1$inExt//`
+		outDir="$outPath/$uniqueID"\bp
 			
 		mkdir -p $outDir
 
@@ -77,7 +78,7 @@ for samplename in ${samplenames[@]}; do
 		echo $outDir
 
 #align reads of input file with BWA, output into .bam files:
-      	bwa_line="bwa mem -t $numcores $genomeFile $inFile > $outDir/$uniqueID.sam"
+      	bwa_line="bwa mem -t $numcores $chrFile $inFile1 $inFile2 > $outDir/$uniqueID"bp.sam
 
       	echo -e
       	echo "This is the bwa_line:"
@@ -85,7 +86,7 @@ for samplename in ${samplenames[@]}; do
 
 #submit jobs to the cluster, creating a log in $logDir which includes reported errors:                	
         qsub -N bwa$uniqueID -hold_jid TRIMGALORE_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $bwa_line
-			j=$(($j+1))
+			j=$(($j+2))
 
 	done;
 done;
