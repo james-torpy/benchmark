@@ -65,3 +65,5 @@ plot = ggplot(data=df, aes(x=read_length, y=uniquely_mapped_reads, group = 1)
 plot
 dev.off()
 
+save.image("mapped_vs_length_computed.RData")
+

@@ -19,7 +19,7 @@ resultsDir="$projectDir/results"
 
 #input/output types
 samplename="long.artfastqgen.reads"
-inType="bwa"
+	inType="bwa"
 
 #extension of files to be used:
 inExt=".sam"
@@ -73,9 +73,9 @@ for inFile in ${files[@]}; do
 	echo $indexline
 	echo -e
 
-#	qsub -N v_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $viewline
-#	qsub -N s_$uniqueID -hold_jid v_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $sortline
-#	qsub -N i_$uniqueID -hold_jid s_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $indexline
+	qsub -N v_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $viewline
+	qsub -N s_$uniqueID -hold_jid v_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $sortline
+	qsub -N i_$uniqueID -hold_jid s_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $indexline
 	
 done;
 
@@ -104,8 +104,8 @@ for inFile in ${uniqueFiles[@]}; do
 
 	headerline="cat $originalFile | head -3 >> $uniquePrefix"\_wheader.sam
 	catline="cat $inFile >> $uniquePrefix"\_wheader.sam
-	viewline2="samtools view -b -S $uniquePrefix"\_wheader.sam > $outFile
-	sortline2="samtools sort -T $uniquePrefix"\_wheader.sam -o $outPrefix.sorted.bam $outFile
+	viewline2="samtools view -b -S $uniquePrefix"_wheader".sam > $outFile"
+	sortline2="samtools sort -T $uniquePrefix.sorted -o $outPrefix.sorted.bam $outFile"
 	indexline2="samtools index $outPrefix.sorted.bam"
 	
 	echo -e
@@ -125,11 +125,11 @@ for inFile in ${uniqueFiles[@]}; do
 	echo $indexline2
 	echo -e
 
-#	qsub -N h_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $headerline
-#	qsub -N c_$uniqueID -hold_jid h_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $catline
-#	qsub -N v_$uniqueID -hold_jid c_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $viewline2
-#	qsub -N s_$uniqueID -hold_jid v_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $sortline2
-#	qsub -N i_$uniqueID -hold_jid s_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $indexline2
+	qsub -N h_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $headerline
+	qsub -N c_$uniqueID -hold_jid h_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $catline
+	qsub -N v_$uniqueID -hold_jid c_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $viewline2
+	qsub -N s_$uniqueID -hold_jid v_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $sortline2
+	qsub -N i_$uniqueID -hold_jid s_$uniqueID -b y -wd $logDir -j y -R y -P GenomeInformatics -pe smp $numcores -V $indexline2
 	
 
 
